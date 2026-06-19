@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Room 405 — Duty Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --chalkboard:#2B3A2F;
+    --chalkboard-dark:#222F26;
+    --paper:#F2ECDD;
+    --turmeric:#D98E2B;
+    --chili:#B23A2E;
+    --coriander:#5C7A52;
+    --ink:#1C1A14;
+    --rest-grey:#8A8676;
+    --line: rgba(242,236,221,0.14);
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+
+  body{
+    background:var(--chalkboard);
+    color:var(--paper);
+    font-family:'Inter',sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .wrap{max-width:780px;margin:0 auto;padding:0 20px 80px;}
+
+  /* HEADER */
+  header{
+    padding:48px 20px 32px;
+    text-align:center;
+    border-bottom:1px solid var(--line);
+    margin-bottom:36px;
+  }
+  .stamp{
+    display:inline-block;
+    border:2px solid var(--turmeric);
+    color:var(--turmeric);
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:2px;
+    padding:4px 12px;
+    border-radius:3px;
+    transform:rotate(-2deg);
+    margin-bottom:18px;
+    text-transform:uppercase;
+  }
+  h1{
+    font-family:'Fraunces',serif;
+    font-weight:700;
+    font-size:clamp(40px,9vw,58px);
+    letter-spacing:-1px;
+    color:var(--paper);
+  }
+  .subtitle{
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px;
+    color:var(--rest-grey);
+    margin-top:10px;
+    letter-spacing:0.5px;
+  }
+
+  /* SECTION LABELS */
+  .section-label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--turmeric);
+    margin-bottom:16px;
+  }
+
+  /* TODAY NAMEPLATES */
+  .today-date{
+    font-family:'Fraunces',serif;
+    font-size:22px;
+    margin-bottom:20px;
+    color:var(--paper);
+  }
+  .nameplates{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    margin-bottom:56px;
+  }
+  .plate{
+    background:var(--chalkboard-dark);
+    border-radius:10px;
+    padding:18px 16px;
+    border-left:5px solid var(--rest-grey);
+    position:relative;
+    overflow:hidden;
+  }
+  .plate.active{
+    box-shadow:0 0 0 1px rgba(242,236,221,0.08), 0 8px 24px -8px rgba(217,142,43,0.25);
+    animation:glow 2.8s ease-in-out infinite;
+  }
+  @keyframes glow{
+    0%,100%{box-shadow:0 0 0 1px rgba(242,236,221,0.08), 0 8px 24px -8px rgba(217,142,43,0.18);}
+    50%{box-shadow:0 0 0 1px rgba(242,236,221,0.08), 0 8px 30px -6px rgba(217,142,43,0.4);}
+  }
+  .plate.cutting{border-left-color:var(--turmeric);}
+  .plate.cooking{border-left-color:var(--coriander);}
+  .plate.washing{border-left-color:var(--chili);}
+  .plate.rest{border-left-color:var(--rest-grey);}
+
+  .plate-name{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:19px;
+    margin-bottom:6px;
+  }
+  .plate-task{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    color:var(--rest-grey);
+  }
+  .plate.cutting .plate-task{color:var(--turmeric);}
+  .plate.cooking .plate-task{color:var(--coriander);}
+  .plate.washing .plate-task{color:var(--chili);}
+
+  /* WEEK CHART */
+  .chart-scroll{
+    overflow-x:auto;
+    margin-bottom:56px;
+    border:1px solid var(--line);
+    border-radius:10px;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px;
+    min-width:600px;
+  }
+  th,td{
+    padding:12px 14px;
+    text-align:left;
+    border-bottom:1px solid var(--line);
+    white-space:nowrap;
+  }
+  th{
+    color:var(--turmeric);
+    text-transform:uppercase;
+    font-size:11px;
+    letter-spacing:1px;
+    background:var(--chalkboard-dark);
+  }
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr.is-today{background:rgba(217,142,43,0.08);}
+  td.day-cell{color:var(--paper);font-weight:700;}
+  td.rest-cell{color:var(--rest-grey);}
+
+  /* RULES */
+  .rules{margin-bottom:56px;}
+  .rule-card{
+    background:var(--chalkboard-dark);
+    border-radius:10px;
+    padding:18px 20px;
+    margin-bottom:10px;
+    display:flex;
+    gap:16px;
+    align-items:flex-start;
+  }
+  .rule-num{
+    font-family:'Fraunces',serif;
+    font-size:22px;
+    color:var(--turmeric);
+    font-weight:600;
+    flex-shrink:0;
+    min-width:28px;
+  }
+  .rule-body h3{
+    font-family:'Inter',sans-serif;
+    font-size:15px;
+    font-weight:700;
+    margin-bottom:4px;
+    color:var(--paper);
+  }
+  .rule-body p{
+    font-size:14px;
+    color:rgba(242,236,221,0.72);
+  }
+
+  /* GOLDEN PRINCIPLES STRIP */
+  .creed{
+    background:var(--chalkboard-dark);
+    border-radius:10px;
+    padding:24px 22px;
+    margin-bottom:40px;
+  }
+  .creed-title{
+    font-family:'Fraunces',serif;
+    font-size:20px;
+    margin-bottom:14px;
+    color:var(--turmeric);
+  }
+  .creed ol{
+    list-style:none;
+    counter-reset:creed-counter;
+  }
+  .creed li{
+    counter-increment:creed-counter;
+    font-size:14px;
+    padding:7px 0 7px 30px;
+    position:relative;
+    border-bottom:1px solid var(--line);
+  }
+  .creed li:last-child{border-bottom:none;}
+  .creed li::before{
+    content:counter(creed-counter);
+    position:absolute;
+    left:0;
+    top:7px;
+    font-family:'JetBrains Mono',monospace;
+    color:var(--turmeric);
+    font-weight:700;
+    font-size:13px;
+  }
+
+  footer{
+    text-align:center;
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:var(--rest-grey);
+    padding-top:20px;
+    border-top:1px solid var(--line);
+  }
+
+  @media (max-width:480px){
+    .nameplates{grid-template-columns:1fr 1fr;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .plate.active{animation:none;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <span class="stamp">Official Notice</span>
+    <h1>Room 405</h1>
+    <div class="subtitle">Duty board · Adinath · Pankaj · Manoj · Pranav</div>
+  </header>
+
+  <section>
+    <div class="section-label">Today's Assignments</div>
+    <div class="today-date" id="todayDate">Loading…</div>
+    <div class="nameplates" id="nameplates"></div>
+  </section>
+
+  <section>
+    <div class="section-label">This Week's Chart</div>
+    <div class="chart-scroll">
+      <table id="weekTable">
+        <thead>
+          <tr><th>Day</th><th>Vegetable Cutting</th><th>Cooking</th><th>Washing</th><th>Rest</th></tr>
+        </thead>
+        <tbody id="weekBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="rules">
+    <div class="section-label">Do's &amp; Don'ts</div>
+
+    <div class="rule-card">
+      <div class="rule-num">1</div>
+      <div class="rule-body">
+        <h3>Step out for phone calls</h3>
+        <p>Take calls in the kitchen or balcony. If you must talk in the room, keep your voice low.</p>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-num">2</div>
+      <div class="rule-body">
+        <h3>Respect sleeping hours</h3>
+        <p>Silent or vibrate mode near a sleeping roommate. No loud talk, laughter, or noise nearby.</p>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-num">3</div>
+      <div class="rule-body">
+        <h3>No loudspeaker, ever</h3>
+        <p>Use earphones for calls, music, and videos. Lowest comfortable volume if none available.</p>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-num">4</div>
+      <div class="rule-body">
+        <h3>Clean up after yourself</h3>
+        <p>No dirty dishes left overnight. Washing duty covers cooking utensils, not personal dishes.</p>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-num">5</div>
+      <div class="rule-body">
+        <h3>Save electricity</h3>
+        <p>Switch off lights, fans, and chargers when not needed. Last one out checks everything's off.</p>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-num">6</div>
+      <div class="rule-body">
+        <h3>Split groceries fairly</h3>
+        <p>Shared items split equally among all 4. Track expenses, settle dues every week.</p>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-num">7</div>
+      <div class="rule-body">
+        <h3>Lock up, always</h3>
+        <p>Lock the door even for short trips out. No sharing the room key or code without group consent.</p>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-num">8</div>
+      <div class="rule-body">
+        <h3>Talk it out</h3>
+        <p>Raise issues directly and calmly. No silent treatment. Bigger matters go to a group discussion.</p>
+      </div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-num">9</div>
+      <div class="rule-body">
+        <h3>Lights-out policy</h3>
+        <p>Agree on a weeknight lights-out time. Staying up late? Use a personal lamp, keep alarms soft.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="creed">
+    <div class="creed-title">Golden Principles</div>
+    <ol>
+      <li>Do your night duty on time — swap in advance if needed.</li>
+      <li>Step out to talk on the phone — always.</li>
+      <li>Silent phones when someone is sleeping.</li>
+      <li>Earphones first, always.</li>
+      <li>Clean as you go — leave no mess behind.</li>
+      <li>Split expenses fairly and settle weekly.</li>
+      <li>Talk it out — no grudges in Room 405.</li>
+    </ol>
+  </section>
+
+  <footer>
+    Agreed upon by Adinath, Pankaj, Manoj &amp; Pranav · Respect the rules, enjoy the room.
+  </footer>
+
+</div>
+
+<script>
+// ---- SCHEDULE DATA (single source of truth — also mirrored in the WhatsApp script) ----
+const SCHEDULE = {
+  Monday:    { cutting:"Adinath", cooking:"Pankaj",  washing:"Manoj",   rest:"Pranav"  },
+  Tuesday:   { cutting:"Pranav",  cooking:"Adinath", washing:"Pankaj",  rest:"Manoj"   },
+  Wednesday: { cutting:"Manoj",   cooking:"Pranav",  washing:"Adinath", rest:"Pankaj"  },
+  Thursday:  { cutting:"Pankaj",  cooking:"Manoj",   washing:"Pranav",  rest:"Adinath" },
+  Friday:    { cutting:"Adinath", cooking:"Manoj",   washing:"Pranav",  rest:"Pankaj"  },
+  Saturday:  { cutting:"Pankaj",  cooking:"Pranav",  washing:"Adinath", rest:"Manoj"   },
+  Sunday:    { cutting:"Manoj",   cooking:"Adinath", washing:"Pankaj",  rest:"Pranav"  },
+};
+
+const DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+
+function getToday(){
+  const d = new Date();
+  return DAYS[(d.getDay() + 6) % 7]; // JS Sunday=0 -> shift so Monday=0
+}
+
+function renderToday(){
+  const today = getToday();
+  document.getElementById('todayDate').textContent = today + ", " + new Date().toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' });
+
+  const todaySched = SCHEDULE[today];
+  const order = [
+    { person: todaySched.cutting, task: "Vegetable Cutting", cls: "cutting" },
+    { person: todaySched.cooking, task: "Cooking", cls: "cooking" },
+    { person: todaySched.washing, task: "Washing", cls: "washing" },
+    { person: todaySched.rest, task: "Rest Day", cls: "rest" },
+  ];
+
+  const container = document.getElementById('nameplates');
+  container.innerHTML = order.map(o => `
+    <div class="plate ${o.cls} active">
+      <div class="plate-name">${o.person}</div>
+      <div class="plate-task">${o.task}</div>
+    </div>
+  `).join('');
+}
+
+function renderWeek(){
+  const today = getToday();
+  const body = document.getElementById('weekBody');
+  body.innerHTML = DAYS.map(day => {
+    const s = SCHEDULE[day];
+    const isToday = day === today ? 'is-today' : '';
+    return `<tr class="${isToday}">
+      <td class="day-cell">${day}</td>
+      <td>${s.cutting}</td>
+      <td>${s.cooking}</td>
+      <td>${s.washing}</td>
+      <td class="rest-cell">${s.rest}</td>
+    </tr>`;
+  }).join('');
+}
+
+renderToday();
+renderWeek();
+</script>
+</body>
+</html>

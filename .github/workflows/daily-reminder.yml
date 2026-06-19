@@ -1,0 +1,27 @@
+name: Send Daily Room 405 WhatsApp Reminders
+
+on:
+  schedule:
+    # Runs at 18:00 IST every day.
+    # GitHub Actions uses UTC time, and IST is UTC+5:30, so 18:00 IST = 12:30 UTC.
+    # Cron format: minute hour day month day-of-week
+    - cron: "30 12 * * *"
+  # Lets you manually trigger it anytime from the GitHub Actions tab, for testing.
+  workflow_dispatch:
+
+jobs:
+  send-reminders:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run WhatsApp reminder script
+        env:
+          SITE_URL: "https://YOUR-SITE-NAME.netlify.app"
+        run: node send-whatsapp.js
