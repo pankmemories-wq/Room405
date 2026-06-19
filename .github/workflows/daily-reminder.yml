@@ -23,5 +23,5 @@ jobs:
 
       - name: Run WhatsApp reminder script
         env:
-          SITE_URL: "https://YOUR-SITE-NAME.netlify.app"
+          SITE_URL: "https://wondrous-gecko-657456.netlify.app"
         run: node send-whatsapp.js
